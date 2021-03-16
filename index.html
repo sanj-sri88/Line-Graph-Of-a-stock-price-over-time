@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stock Tracker</title>
+    <link rel="stylesheet" type="text/css" href="site.css">
+    <script src="stock-tracker.js"></script>
+</head>
+
+<body style="font-family: Lucida Console, Monaco, monospace;">
+
+    <h1>Stock tracker</h1>
+    <div id="wrapper">
+        <canvas id="canvas" width="1200" height="400">
+
+        </canvas>
+        <div id="graphLabels"></div>
+    </div>
+    <script>
+        var canvas = document.getElementById("canvas");
+        var settings = {
+            "backgroundColor": "",
+            "chartColor": "",
+            "chartLinesColor": "",
+            "textColor": ""
+        };
+
+        const url = 'http://api.marketstack.com/v1/eod?access_key=6b7bd30828036d3abf7c78e0668909b7&symbols=AAPL';
+        fetch(url).then((resp) => resp.json()).then(function (data) {
+            let dataPoint = data.data;
+
+            var _data = { 'cols': [] }
+            var __data = [{ "name": "low", "values": [] },
+            { "name": "high", "values": [] },
+            { "name": "open", "values": [] },
+            { "name": "close", "values": [] }]
+
+            data['data'].forEach((element, index) => {
+                __data[0].values.push(element.low);
+                __data[1].values.push(element.high);
+                __data[2].values.push(element.open);
+                __data[3].values.push(element.close);
+                if (index == 0 || index % 20 === 0) {
+                    _data["cols"].push(element.date)
+                }
+            });
+            _data["xName"] = "Time";
+            _data['yName'] = "Value";
+            _data["data"] = __data;
+
+            chartify(canvas, _data, settings);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    </script>
+</body>
+
+</html>
